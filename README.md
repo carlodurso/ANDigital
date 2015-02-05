@@ -16,7 +16,7 @@ You are then free to display the results as you see fit.
 
 ## Rules
 
-*   We think that this is easiest to complete using HTML/JS/CSS but **you are able to use any language, platform, framework or libraries that you think is useful.**
+*   We think that this is easiest to complete using HTML/JS/CSS but **you are able to use any language, platform, framework or libraries that you think are useful.**
 *   Feel free to use Google, Stack Overflow and any other websites or tutorials.
 *   **We must be able to run your code.**
 *   **Please submit your code by creating a repository on GitHub and providing us with the link to the repo.**

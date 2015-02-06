@@ -20,6 +20,7 @@ You are then free to display the results as you see fit.
 *   Feel free to use Google, Stack Overflow and any other websites or tutorials.
 *   **We must be able to run your code.**
 *   **Please submit your code by creating a repository on GitHub and providing us with the link to the repo.**
+*   **You must check in your code at least once every 30mins.**
 *   When you submit your code **you must send a summary (or have it as your readme.md) explaining the approach you have taken.**
 
 ## Bonus Credit

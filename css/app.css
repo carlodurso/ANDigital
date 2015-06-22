@@ -13,6 +13,13 @@ body {
     margin-bottom: 30px;
 }
 
+#map { 
+    position:absolute; 
+    top:0; 
+    bottom:0; 
+    width:100%; 
+}
+
 .container {
     width:900px;
     margin: auto;

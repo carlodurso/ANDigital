@@ -57,3 +57,8 @@ a, a:hover {
 li {
     line-height: 24px;
 }
+
+.leaflet-container a:hover{
+    color: #f60;
+    font-weight: 400;
+}

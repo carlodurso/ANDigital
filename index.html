@@ -18,33 +18,38 @@
 
 <div id='map'></div>
 
-<!-- jQuery is required for this example. -->
 <script>    
-    
+//Mapbox API access    
 L.mapbox.accessToken = 'pk.eyJ1IjoiY2FybG9kdXJzbyIsImEiOiI2NTA1MDkyYTJhNmNmYjRjODcyNGQ5MDg0NWViODc4MSJ9.3gPBbhsIxdHaeY4Lj3urBg';
 
-var geocoderControl = L.mapbox.geocoderControl('mapbox.places' , {
-        autocomplete: true,
-        keepOpen: true
-    });
+// Draw map    
+var map = L.mapbox.map('map', 'mapbox.streets');
 
+// Geo related helpers     
 var geocoder = L.mapbox.geocoder('mapbox.places');
-var map = L.mapbox.map('map', 'mapbox.streets')
-//    .addControl(L.mapbox.geocoderControl('mapbox.places', {
-//        autocomplete: true,
-//        keepOpen: true
-//    }));
-    .setView([51.49, -0.12], 16);
-
-    geocoderControl.addTo(map);
-//    geocoder.query('N33LB', showMap);
-
-
-//    var position = navigator.geolocation.getCurrentPosition(function(position) {
-//        alert(position.coords.latitude, position.coords.longitude);
-//    });
+var geocoderControl = L.mapbox.geocoderControl('mapbox.places' , {
+    autocomplete: true,
+    keepOpen: true
+});
     
-    function locate() {
+    geocoderControl.addTo(map);
+    geocoder.query('WC2N4JF', showMap);
+
+    // Draws the initial map location
+    function showMap(err, data) {
+        // The geocoder can return an area, like a city, or a
+        // point, like an address. Here we handle both cases,
+        // by fitting the map bounds to an area or zooming to a point.
+        if (data.lbounds) {
+            map.fitBounds(data.lbounds);
+        } else if (data.latlng) {
+            map.setView([data.latlng[0], data.latlng[1]], 17);
+        }
+        locate();
+    }
+    
+    // Use jQuery to make an AJAX request to Foursquare to load markers data.
+    var locate = function() {
         $.getJSON(API_ENDPOINT
         .replace('CLIENT_ID', CLIENT_ID)
         .replace('CLIENT_SECRET', CLIENT_SECRET)
@@ -71,55 +76,33 @@ var map = L.mapbox.map('map', 'mapbox.streets')
     }
     
     geocoderControl.on('select', function(res) {
-//    output.innerHTML = JSON.stringify(res.results.features[0]);
         locate();
     });
-    
-// Credit Foursquare for their wonderful data
-map.attributionControl
-    .addAttribution('<a href="https://foursquare.com/">Foursquare data</a>');
 
-//  map.on('click', function(e) {
-//    var latitude = e.latlng.lat;
-//    var longitude = e.latlng.lng;
-//    alert(latitude + " - " + longitude);
-//  });
-    
-    function showMap(err, data) {
-        // The geocoder can return an area, like a city, or a
-        // point, like an address. Here we handle both cases,
-        // by fitting the map bounds to an area or zooming to a point.
-        if (data.lbounds) {
-            map.fitBounds(data.lbounds);
-            console.log(map.getCenter().lat);
-            console.log(map.getCenter().lng);
-        } else if (data.latlng) {
-            map.setView([data.latlng[0], data.latlng[1]], 13);
-        }
-    }
         
-// Create a Foursquare developer account: https://developer.foursquare.com/
-// NOTE: CHANGE THESE VALUES TO YOUR OWN:
-// Otherwise they can be cycled or deactivated with zero notice.
-var CLIENT_ID = '1GRGFMAQRF3XPSVSFEEYWIGAV4EARUETPNM025PFEPVM3FZ0';
-var CLIENT_SECRET = 'AMN3BLP3XHOH000VWKPSBJFMSOHWPLZTMJOGLTRJXC2HSMSC';
+    // Create a Foursquare developer account: https://developer.foursquare.com/
+    // NOTE: CHANGE THESE VALUES TO YOUR OWN:
+    // Otherwise they can be cycled or deactivated with zero notice.
+    var CLIENT_ID = '1GRGFMAQRF3XPSVSFEEYWIGAV4EARUETPNM025PFEPVM3FZ0';
+    var CLIENT_SECRET = 'AMN3BLP3XHOH000VWKPSBJFMSOHWPLZTMJOGLTRJXC2HSMSC';
 
-// https://developer.foursquare.com/start/search
-var API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search' +
-  '?client_id=CLIENT_ID' +
-  '&client_secret=CLIENT_SECRET' +
-  '&v=20130815' +
-  '&ll=LATLON' +
-//  '&near=LATLON' +
-// '&query=topPicks' +    
-  '&section=trending' +
-  '&callback=?';
+    // https://developer.foursquare.com/start/search
+    var API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search' +
+      '?client_id=CLIENT_ID' +
+      '&client_secret=CLIENT_SECRET' +
+      '&v=20130815' +
+      '&ll=LATLON' +
+    // '&query=topPicks' +    
+      '&section=trending' +
+      '&callback=?';
 
-// Keep our place markers organized in a nice group.
-var foursquarePlaces = L.layerGroup().addTo(map);
+    // Credit Foursquare for their wonderful data
+    map.attributionControl
+        .addAttribution('<a href="https://foursquare.com/">Foursquare data</a>');
+    
+    // Keep our place markers organized in a nice group.
+    var foursquarePlaces = L.layerGroup().addTo(map);
 
-// Use jQuery to make an AJAX request to Foursquare to load markers data.
-locate();    
 </script>
 
 

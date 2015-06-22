@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset=utf-8 />
-        <title>Places from Foursquare</title>
+        <title>Trending from Foursquare</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.2.0/mapbox.css' rel='stylesheet' />
@@ -19,22 +19,71 @@
 <div id='map'></div>
 
 <!-- jQuery is required for this example. -->
-<script>
+<script>    
+    
 L.mapbox.accessToken = 'pk.eyJ1IjoiY2FybG9kdXJzbyIsImEiOiI2NTA1MDkyYTJhNmNmYjRjODcyNGQ5MDg0NWViODc4MSJ9.3gPBbhsIxdHaeY4Lj3urBg';
+
+var geocoderControl = L.mapbox.geocoderControl('mapbox.places' , {
+        autocomplete: true,
+        keepOpen: true
+    });
 
 var geocoder = L.mapbox.geocoder('mapbox.places');
 var map = L.mapbox.map('map', 'mapbox.streets')
-    .addControl(L.mapbox.geocoderControl('mapbox.places', {
-        autocomplete: true,
-        keepOpen: true
-    }));
-//    .setView([40, -74.50], 10);
+//    .addControl(L.mapbox.geocoderControl('mapbox.places', {
+//        autocomplete: true,
+//        keepOpen: true
+//    }));
+    .setView([51.49, -0.12], 16);
 
-    geocoder.query('London, UK', showMap);
+    geocoderControl.addTo(map);
+//    geocoder.query('N33LB', showMap);
+
+
+//    var position = navigator.geolocation.getCurrentPosition(function(position) {
+//        alert(position.coords.latitude, position.coords.longitude);
+//    });
+    
+    function locate() {
+        $.getJSON(API_ENDPOINT
+        .replace('CLIENT_ID', CLIENT_ID)
+        .replace('CLIENT_SECRET', CLIENT_SECRET)
+        .replace('LATLON', map.getCenter().lat +
+        ',' + map.getCenter().lng), function(result, status) {
+
+        if (status !== 'success') return alert('Request to Foursquare failed');
+
+            // Transform each venue result into a marker on the map.
+            for (var i = 0; i < result.response.venues.length; i++) {
+              var venue = result.response.venues[i];
+              var latlng = L.latLng(venue.location.lat, venue.location.lng);
+              var marker = L.marker(latlng, {
+                  icon: L.mapbox.marker.icon({
+                    'marker-color': '#ff6600',
+                    'marker-size': 'large'
+                  })
+                })
+              .bindPopup('<strong><a href="https://foursquare.com/v/' + venue.id + '">' +
+                venue.name + '</a></strong>')
+                .addTo(foursquarePlaces);
+            }
+        });
+    }
+    
+    geocoderControl.on('select', function(res) {
+//    output.innerHTML = JSON.stringify(res.results.features[0]);
+        locate();
+    });
+    
 // Credit Foursquare for their wonderful data
-//map.attributionControl
-//    .addAttribution('<a href="https://foursquare.com/">Places data from Foursquare</a>');
+map.attributionControl
+    .addAttribution('<a href="https://foursquare.com/">Foursquare data</a>');
 
+//  map.on('click', function(e) {
+//    var latitude = e.latlng.lat;
+//    var longitude = e.latlng.lng;
+//    alert(latitude + " - " + longitude);
+//  });
     
     function showMap(err, data) {
         // The geocoder can return an area, like a city, or a
@@ -42,6 +91,8 @@ var map = L.mapbox.map('map', 'mapbox.streets')
         // by fitting the map bounds to an area or zooming to a point.
         if (data.lbounds) {
             map.fitBounds(data.lbounds);
+            console.log(map.getCenter().lat);
+            console.log(map.getCenter().lng);
         } else if (data.latlng) {
             map.setView([data.latlng[0], data.latlng[1]], 13);
         }
@@ -59,7 +110,7 @@ var API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search' +
   '&client_secret=CLIENT_SECRET' +
   '&v=20130815' +
   '&ll=LATLON' +
-//  '&near=London' +
+//  '&near=LATLON' +
 // '&query=topPicks' +    
   '&section=trending' +
   '&callback=?';
@@ -68,31 +119,7 @@ var API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search' +
 var foursquarePlaces = L.layerGroup().addTo(map);
 
 // Use jQuery to make an AJAX request to Foursquare to load markers data.
-$.getJSON(API_ENDPOINT
-    .replace('CLIENT_ID', CLIENT_ID)
-    .replace('CLIENT_SECRET', CLIENT_SECRET)
-    .replace('LATLON', map.getCenter().lat +
-        ',' + map.getCenter().lng), function(result, status) {
-
-    if (status !== 'success') return alert('Request to Foursquare failed');
-
-    // Transform each venue result into a marker on the map.
-    for (var i = 0; i < result.response.venues.length; i++) {
-      var venue = result.response.venues[i];
-      var latlng = L.latLng(venue.location.lat, venue.location.lng);
-      var marker = L.marker(latlng, {
-          icon: L.mapbox.marker.icon({
-            'marker-color': '#ff6600',
-//            'marker-symbol': 'cafe',
-            'marker-size': 'large'
-          })
-        })
-      .bindPopup('<strong><a href="https://foursquare.com/v/' + venue.id + '">' +
-        venue.name + '</a></strong>')
-        .addTo(foursquarePlaces);
-    }
-
-});
+locate();    
 </script>
 
 
